@@ -1,0 +1,21 @@
+{
+  "name": "rsvptje",
+  "version": "1.0.0",
+  "description": "Web3 RSVP app where users can RSVP to an event by depositing an amount of crypto and receiving it back after checking in at the event",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "web3",
+    "events",
+    "app",
+    "rsvp"
+  ],
+  "author": "noatorious",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^1.0.2",
+    "hardhat": "^2.10.2"
+  }
+}
