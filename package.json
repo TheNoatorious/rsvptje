@@ -1,19 +1,27 @@
 {
   "name": "rsvptje",
   "version": "1.0.0",
-  "description": "Web3 RSVP app where users can RSVP to an event by depositing an amount of crypto and receiving it back after checking in at the event",
+  "description": "Web3 RSVP application where the user can attend an event by RSVP'ing and deposit a small amount of crypto which they can receive back if they attend the event.",
   "main": "index.js",
   "scripts": {
+    "script": "node scripts/run.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noatorious/rsvptje.git"
   },
   "keywords": [
     "web3",
     "events",
-    "app",
     "rsvp"
   ],
   "author": "noatorious",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/noatorious/rsvptje/issues"
+  },
+  "homepage": "https://github.com/noatorious/rsvptje#readme",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",
     "hardhat": "^2.10.2"

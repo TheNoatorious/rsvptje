@@ -1,16 +1,17 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
+// Import this file to use console.log
 import "hardhat/console.sol";
 
 contract RSVP {
     event NewEventCreated(
-    bytes32 eventID,
-    address creatorAddress,
-    uint256 eventTimestamp,
-    uint256 maxCapacity,
-    uint256 deposit,
-    string eventDataCID
+        bytes32 eventID,
+        address creatorAddress,
+        uint256 eventTimestamp,
+        uint256 maxCapacity,
+        uint256 deposit,
+        string eventDataCID
     );
 
     event NewRSVP(bytes32 eventID, address attendeeAddress);
@@ -31,73 +32,70 @@ contract RSVP {
         bool paidOut;
     }
 
-    // Add an ID to each new event
     mapping(bytes32 => CreateEvent) public idToEvent;
 
     function createNewEvent(
         uint256 eventTimestamp,
         uint256 deposit,
         uint256 maxCapacity,
-        string calldata eventDataCID
-    ) external {
-        // generate an eventID based on other things passed in to generate a hash
-        bytes32 eventId = keccak256(
-            abi.encodePacked(
+        string calldata eventDataCID) external {
+            // generate an eventID based on variables passed in to generate a hash
+            bytes32 eventId = keccak256(
+                abi.encodePacked(
+                    msg.sender,
+                    address(this),
+                    eventTimestamp,
+                    deposit,
+                    maxCapacity
+                )
+            );
+
+            address[] memory confirmedRSVPs;
+            address[] memory claimedRSVPs;
+
+
+            // this creates a new CreateEvent struct and adds it to the idToEvent mapping
+            idToEvent[eventId] = CreateEvent(
+                eventId,
+                eventDataCID,
                 msg.sender,
-                address(this),
                 eventTimestamp,
                 deposit,
-                maxCapacity
-            )
-        );
+                maxCapacity,
+                confirmedRSVPs,
+                claimedRSVPs,
+                false
+            );
 
-        address[] memory confirmedRSVPs;
-        address[] memory claimedRSVPs;
+            require(idToEvent[eventId].eventTimestamp == 0, "ALREADY REGISTERED");
 
-
-        // this creates a new CreateEvent struct and adds it to the idToEvent mapping
-        idToEvent[eventId] = CreateEvent(
-            eventId,
-            eventDataCID,
-            msg.sender,
-            eventTimestamp,
-            deposit,
-            maxCapacity,
-            confirmedRSVPs,
-            claimedRSVPs,
-            false
-        );
-
-        // make sure this id isn't already claimed
-        require(idToEvent[eventId].eventTimestamp == 0, "ALREADY REGISTERED");
-
-        emit NewEventCreated(
-            eventId,
-            msg.sender,
-            eventTimestamp,
-            maxCapacity,
-            deposit,
-            eventDataCID
-        );
+            emit NewEventCreated(
+                eventId,
+                msg.sender,
+                eventTimestamp,
+                maxCapacity,
+                deposit,
+                eventDataCID
+            );
     }
 
     function createNewRSVP(bytes32 eventId) external payable {
         // look up event from our mapping
         CreateEvent storage myEvent = idToEvent[eventId];
 
-        // transfer deposit to our contract / require that they send in enough ETH to cover the deposit requirement of this specific event
+        // require that they send in enough ETH to cover the deposit requirement of this specific event
         require(msg.value == myEvent.deposit, "NOT ENOUGH");
 
-        // require that the event hasn't already happened (<eventTimestamp)
+        // require that the event hasn't already happened
         require(block.timestamp <= myEvent.eventTimestamp, "ALREADY HAPPENED");
 
-        // make sure event is under max capacity
+        // require event has to be under max capacity
         require(
             myEvent.confirmedRSVPs.length < myEvent.maxCapacity,
             "This event has reached capacity"
         );
 
-        // require that msg.sender isn't already in myEvent.confirmedRSVPs AKA hasn't already RSVP'd
+        // require that msg.sender isn't already in myEvent.confirmedRSVPs
         for (uint8 i = 0; i < myEvent.confirmedRSVPs.length; i++) {
             require(myEvent.confirmedRSVPs[i] != msg.sender, "ALREADY CONFIRMED");
         }
@@ -161,8 +159,6 @@ contract RSVP {
         for (uint8 i = 0; i < myEvent.confirmedRSVPs.length; i++) {
             confirmAttendee(eventId, myEvent.confirmedRSVPs[i]);
         }
-
-        emit ConfirmedAttendee(eventId, attendee);
     }
 
     function withdrawUnclaimedDeposits(bytes32 eventId) external {
@@ -198,5 +194,10 @@ contract RSVP {
         }
 
         require(sent, "Failed to send Ether");
+
+        emit DepositsPaidOut(eventId);
     }
+
 }
+
+
