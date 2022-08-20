@@ -4,6 +4,21 @@ pragma solidity ^0.8.9;
 import "hardhat/console.sol";
 
 contract RSVP {
+    event NewEventCreated(
+    bytes32 eventID,
+    address creatorAddress,
+    uint256 eventTimestamp,
+    uint256 maxCapacity,
+    uint256 deposit,
+    string eventDataCID
+    );
+
+    event NewRSVP(bytes32 eventID, address attendeeAddress);
+
+    event ConfirmedAttendee(bytes32 eventID, address attendeeAddress);
+
+    event DepositsPaidOut(bytes32 eventID);
+
     struct CreateEvent {
         bytes32 eventId;
         string eventDataCID;
@@ -55,6 +70,15 @@ contract RSVP {
 
         // make sure this id isn't already claimed
         require(idToEvent[eventId].eventTimestamp == 0, "ALREADY REGISTERED");
+
+        emit NewEventCreated(
+            eventId,
+            msg.sender,
+            eventTimestamp,
+            maxCapacity,
+            deposit,
+            eventDataCID
+        );
     }
 
     function createNewRSVP(bytes32 eventId) external payable {
@@ -79,6 +103,8 @@ contract RSVP {
         }
 
         myEvent.confirmedRSVPs.push(payable(msg.sender));
+
+        emit NewRSVP(eventId, msg.sender);
     }
 
     function confirmAttendee(bytes32 eventId, address attendee) public {
@@ -120,6 +146,8 @@ contract RSVP {
         }
 
         require(sent, "Failed to send Ether");
+
+        emit ConfirmedAttendee(eventId, attendee);
     }
 
     function confirmAllAttendees(bytes32 eventId) external {
@@ -133,6 +161,8 @@ contract RSVP {
         for (uint8 i = 0; i < myEvent.confirmedRSVPs.length; i++) {
             confirmAttendee(eventId, myEvent.confirmedRSVPs[i]);
         }
+
+        emit ConfirmedAttendee(eventId, attendee);
     }
 
     function withdrawUnclaimedDeposits(bytes32 eventId) external {
