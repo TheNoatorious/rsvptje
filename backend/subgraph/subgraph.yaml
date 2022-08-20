@@ -1,0 +1,35 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+features:
+- ipfsOnEthereumContracts
+dataSources:
+  - kind: ethereum
+    name: RSVP
+    network: mumbai
+    source:
+      address: "0x71D2182Ff472A107Ac1c6374BBA3B974F63659eb"
+      abi: RSVP
+      startBlock: 27705217
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Event
+        - Account
+        - RSVP
+        - Confirmation
+      abis:
+        - name: RSVP
+          file: ./abis/RSVP.json
+      eventHandlers:
+        - event: ConfirmedAttendee(bytes32,address)
+          handler: handleConfirmedAttendee
+        - event: DepositsPaidOut(bytes32)
+          handler: handleDepositsPaidOut
+        - event: NewEventCreated(bytes32,address,uint256,uint256,uint256,string)
+          handler: handleNewEventCreated
+        - event: NewRSVP(bytes32,address)
+          handler: handleNewRSVP
+      file: ./src/rsvp.ts
