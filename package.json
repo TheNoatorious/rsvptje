@@ -25,9 +25,11 @@
   "homepage": "https://github.com/noatorious/rsvptje#readme",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",
+    "@nomiclabs/hardhat-etherscan": "^3.1.0",
     "hardhat": "^2.10.2"
   },
   "dependencies": {
+    "@protofire/subgraph-toolkit": "^0.1.2",
     "dotenv": "^16.0.1"
   }
 }

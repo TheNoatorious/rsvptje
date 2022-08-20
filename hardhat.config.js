@@ -14,4 +14,7 @@ module.exports = {
       gasPrice: 8000000000,
     },
   },
+  etherscan: {
+    apiKey: process.env.POLYGONSCAN_API_KEY,
+  }
 };

@@ -194,7 +194,4 @@ contract RSVP {
 
         emit DepositsPaidOut(eventId);
     }
-
 }
-
-
